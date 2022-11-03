@@ -15,6 +15,12 @@ export const postJoin = async (req, res) => {
     });
   }
   const userExist = await User.exists({ $or: [{ email }, { id }] });
+  if (userExist) {
+    return res.render("join", {
+      pageTitle,
+      errorMessage: "아이디 혹은 이메일이 이미 존재합니다.",
+    });
+  }
   try {
     await User.create({
       name,
