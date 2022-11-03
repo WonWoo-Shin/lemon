@@ -9,10 +9,16 @@ html(lang="en")
         header 
             nav 
                 ul  
-                    li 
-                        a(href="/login") Login 
-                    li 
-                        a(href="/join") Join 
+                    if !loggedIn
+                        li 
+                            a(href="/login") 로그인
+                        li 
+                            a(href="/join") 가입 
+                    else    
+                         li 
+                            a(href="/logout") 로그아웃
+                         li 
+                            a(href="/profile") 내 정보
         main
             h1=pageTitle
             block content
