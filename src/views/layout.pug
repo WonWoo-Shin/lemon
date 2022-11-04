@@ -9,6 +9,8 @@ html(lang="en")
         header 
             nav 
                 ul  
+                    li 
+                        a(href="/") LEMON 
                     if !loggedIn
                         li 
                             a(href="/login") 로그인
@@ -18,7 +20,7 @@ html(lang="en")
                          li 
                             a(href="/logout") 로그아웃
                          li 
-                            a(href="/profile") 내 정보
+                            a(href="/user") 내 정보
         main
             h1=pageTitle
             block content

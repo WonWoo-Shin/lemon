@@ -4,6 +4,7 @@ import session from "express-session";
 import mongoose from "mongoose";
 import { middleware } from "./middleware";
 import rootRouter from "./router/rootRouter";
+import userRouter from "./router/userRouter";
 import MongoStore from "connect-mongo";
 
 const app = express();
@@ -21,5 +22,6 @@ app.use(
 );
 app.use(middleware);
 app.use("/", rootRouter);
+app.use("/user", userRouter);
 
 app.listen(4000, () => console.log("Server Connnected✅"));
