@@ -7,23 +7,24 @@ export const getJoin = (req, res) => res.render("join", { pageTitle: "가입" })
 
 export const postJoin = async (req, res) => {
   const pageTitle = "가입";
+  const RENDER_JOIN = "join";
   const { name, email, id, password, password2 } = req.body;
   if (password !== password2) {
-    return res.status(400).render("join", {
+    return res.status(400).render(RENDER_JOIN, {
       pageTitle,
       errorMessage: "비밀번호가 서로 일치하지 않습니다.",
     });
   }
   const emailExist = await User.exists({ email });
   if (emailExist) {
-    return res.status(400).render("join", {
+    return res.status(400).render(RENDER_JOIN, {
       pageTitle,
       errorMessage: "이미 존재하는 이메일입니다.",
     });
   }
   const idExist = await User.exists({ id });
   if (idExist) {
-    return res.status(400).render("join", {
+    return res.status(400).render(RENDER_JOIN, {
       pageTitle,
       errorMessage: "이미 존재하는 아이디입니다.",
     });
@@ -48,17 +49,18 @@ export const getLogin = (req, res) =>
 
 export const postLogin = async (req, res) => {
   const pageTitle = "로그인";
+  const RENDER_LOGIN = "login";
   const { id, password } = req.body;
   const user = await User.findOne({ id });
   if (!user) {
-    return res.status(400).render("login", {
+    return res.status(400).render(RENDER_LOGIN, {
       pageTitle,
       errorMessage: "존재하지 않는 아이디입니다.",
     });
   }
   const pwdCheck = await bcrypt.compare(password, user.password);
   if (!pwdCheck) {
-    return res.status(400).render("login", {
+    return res.status(400).render(RENDER_LOGIN, {
       pageTitle,
       errorMessage: "비밀번호가 일치하지 않습니다.",
     });
@@ -81,13 +83,20 @@ export const postEditUser = async (req, res) => {
     },
     body: { name, email, id },
   } = req;
-  const updateUser = await User.findByIdAndUpdate(
-    _id,
-    { name, email, id },
-    { new: true }
-  );
-  req.session.user = updateUser;
-  return res.redirect("/user");
+  try {
+    const updateUser = await User.findByIdAndUpdate(
+      _id,
+      { name, email, id },
+      { new: true }
+    );
+    req.session.user = updateUser;
+    return res.redirect("/user");
+  } catch {
+    return res.render("edit-user", {
+      pageTitle: "내 정보 수정",
+      errorMessage: "이메일 혹은 아이디가 이미 존재합니다.",
+    });
+  }
 };
 
 export const getEditPassword = (req, res) =>
@@ -95,6 +104,7 @@ export const getEditPassword = (req, res) =>
 
 export const postEditPassword = async (req, res) => {
   const pageTitle = "비밀번호 변경";
+  const RENDER_EDITPWD = "edit-password";
   const {
     session: {
       user: { _id },
@@ -104,18 +114,25 @@ export const postEditPassword = async (req, res) => {
   const user = await User.findById(_id);
   const pwdCheck = await bcrypt.compare(oldPassword, user.password);
   if (!pwdCheck) {
-    return res.render("edit-password", {
+    return res.render(RENDER_EDITPWD, {
       pageTitle,
       errorMessage: "현재 비밀번호가 일치하지 않습니다.",
     });
   }
+  if (oldPassword === newPassword) {
+    return res.render(RENDER_EDITPWD, {
+      pageTitle,
+      errorMessage: "현재 비밀번호와 다른 비밀번호를 입력해주세요.",
+    });
+  }
   if (newPassword !== newPassword2) {
-    return res.render("edit-password", {
+    return res.render(RENDER_EDITPWD, {
       pageTitle,
       errorMessage: "새 비밀번호가 서로 일치하지 않습니다.",
     });
   }
   user.password = newPassword;
+  await user.save();
   return res.redirect("/user");
 };
 
