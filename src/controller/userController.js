@@ -3,10 +3,11 @@ import bcrypt from "bcrypt";
 
 export const home = (req, res) => res.render("home", { pageTitle: "홈" });
 
-export const getJoin = (req, res) => res.render("join", { pageTitle: "가입" });
+export const getJoin = (req, res) =>
+  res.render("join", { pageTitle: "계정 만들기" });
 
 export const postJoin = async (req, res) => {
-  const pageTitle = "가입";
+  const pageTitle = "계정 만들기";
   const RENDER_JOIN = "join";
   const { name, email, id, password, password2 } = req.body;
   if (password !== password2) {
