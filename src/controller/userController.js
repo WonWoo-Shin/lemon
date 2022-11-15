@@ -123,7 +123,7 @@ export const postEditPassword = async (req, res) => {
   if (oldPassword === newPassword) {
     return res.render(RENDER_EDITPWD, {
       pageTitle,
-      errorMessage: "현재 비밀번호와 다른 비밀번호를 입력해주세요.",
+      errorMessage: "현재 비밀번호와 다른 비밀번호로 설정해주세요.",
     });
   }
   if (newPassword !== newPassword2) {
@@ -140,4 +140,24 @@ export const postEditPassword = async (req, res) => {
 export const logout = (req, res) => {
   req.session.destroy();
   return res.redirect("/");
+};
+
+export const getFindId = (req, res) =>
+  res.render("find-id", { pageTitle: "아이디 찾기" });
+
+export const postFindId = async (req, res) => {
+  const pageTitle = "아이디 찾기";
+  const RENDER_FINDID = "find-id";
+  const { name, email } = req.body;
+  const user = await User.findOne({ name });
+  if (!user || name !== user.name || email !== user.email) {
+    return res.render(RENDER_FINDID, {
+      pageTitle,
+      errorMessage: "해당 정보의 아이디를 찾을 수 없습니다.",
+    });
+  }
+  return res.render(RENDER_FINDID, {
+    pageTitle,
+    findMessage: `아이디 : ${user.id}`,
+  });
 };
